@@ -1,18 +1,25 @@
 <?php
-session_start();
+
+$session_start;
 $_SESSION['user'] = array();
-$_SESSION['user']['name'] = 'Juliancito';
+$_SESSION['user']['name'] = 'julian';
 
 require ('User.php');
 require ('Coffee.php');
 
 class AuthenticationService {
 
-    public function user()
+    private $sessionData;
+
+    public function __construct(array $sessionData = array() )
     {
-        $user = new User($_SESSION['user']);
+          $this->sessionData = $sessionData;
     }
 
+    public function user()
+    {
+          return new User($this->sessionData);
+    }
 }
 
 class Controller {
@@ -21,24 +28,19 @@ class Controller {
 
     public function __construct(AuthenticationService $auth)
     {
-        $this->auth = $auth;
+          $this->auth = $auth;
     }
 
     public function action()
     {
         $user = $this->auth->user();
         $coffee = new Coffee();
-        $menssage = $user->drink($coffee);
-
+        $message = $user->drink($coffee);
         require ('view.php');
     }
-
-
 }
-/*
+$auth = new AuthenticationService(['name' => 'Dulio']);
 
-$controller = new Controller(new AuthenticationService $user );
+
+$controller = new Controller($auth);
 $controller->action();
-*/
-
-$user = new AuthenticationService
