@@ -1,46 +1,39 @@
 <?php
 
-$session_start;
-$_SESSION['user'] = array();
-$_SESSION['user']['name'] = 'julian';
-
 require ('User.php');
 require ('Coffee.php');
+require ('AuthenticationService.php');
+require ('CoffeeMaker.php');
+require ('BarTender.php');
 
-class AuthenticationService {
+interface BeverageMaker {
 
-    private $sessionData;
+    public function make();
 
-    public function __construct(array $sessionData = array() )
-    {
-          $this->sessionData = $sessionData;
-    }
-
-    public function user()
-    {
-          return new User($this->sessionData);
-    }
 }
+
 
 class Controller {
 
     private $auth;
+    private $coffe;
 
     public function __construct(AuthenticationService $auth)
     {
           $this->auth = $auth;
     }
 
-    public function action()
+    public function action(BeverageMaker $beverageMaker)
     {
         $user = $this->auth->user();
-        $coffee = new Coffee();
-        $message = $user->drink($coffee);
+
+        $beverage = $beverageMaker->make();
+
+        $message = $user->drink($beverage);
+
         require ('view.php');
     }
 }
 $auth = new AuthenticationService(['name' => 'Dulio']);
-
-
 $controller = new Controller($auth);
-$controller->action();
+$controller->action(new BarTender);
